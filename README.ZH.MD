@@ -9,7 +9,7 @@
 ````xml
         <dependency>
             <groupId>com.xqlee.boot</groupId>
-            <artifactId>easylucene-spring-boot-starter</artifactId>
+            <artifactId>easy-lucene-spring-boot-starter</artifactId>
             <version>1.0.0</version>
         </dependency>
 ````
