@@ -20,6 +20,7 @@ import com.xqlee.easylucene.autoconfigure.EasyLuceneProperties;
 import com.xqlee.easylucene.model.SearchField;
 import com.xqlee.easylucene.model.SearchResult;
 import com.xqlee.easylucene.service.EasyLuceneQueryService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
@@ -36,7 +37,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;

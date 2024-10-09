@@ -10,7 +10,7 @@ The component library can easily use apache lucene library to quickly realize th
         <dependency>
             <groupId>com.xqlee.boot</groupId>
             <artifactId>easy-lucene-spring-boot-starter</artifactId>
-            <version>1.0.1</version>
+            <version>3.0.0</version>
         </dependency>
 ````
 `The latest version number is recommended`
@@ -110,6 +110,10 @@ String pathname);`
 Note: Using the Query container to query keywords requires special symbolic handling
 
 `String keywords = QueryParser.escape(keywords)`
+
+## spring boot versions
+- spring boox 2.x.x -> com.xqlee.boot:easy-lucene-spring-boot-starter:1.x.x
+- spring boox 3.x.x -> com.xqlee.boot:easy-lucene-spring-boot-starter:3.x.x
 
 ## LICENSE
 Apache Software License, Version 2.0

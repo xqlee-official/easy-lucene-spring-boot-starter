@@ -19,17 +19,17 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.xqlee.boot</groupId>
   <artifactId>easy-lucene-spring-boot-starter</artifactId>
-  <version>1.0.1</version>
+  <version>3.0.0</version>
   <name>easy-lucene-spring-boot-starter</name>
   <url>http://github.com/xqlee-official/easy-lucene-spring-boot-starter</url>
   <description>Easy way to use apache lucene.</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>
+    <java.version>17</java.version>
     <!-- Note that the search version should not be upgraded at will. The index file cannot be read due to version problems -->
     <lucene.version>6.0.0</lucene.version>
-    <spring.boot.version>2.2.2.RELEASE</spring.boot.version>
+    <spring.boot.version>3.0.0</spring.boot.version>
     <hutool.all.version>5.8.26</hutool.all.version>
     <fastjson2.version>2.0.47</fastjson2.version>
   </properties>
@@ -139,15 +139,15 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>8</source>
-          <target>8</target>
+          <source>17</source>
+          <target>17</target>
         </configuration>
       </plugin>
       <!-- Javadoc -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.4</version>
+        <version>3.10.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -161,7 +161,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.2.1</version>
+        <version>3.3.1</version>
         <executions>
           <execution>
             <phase>package</phase>

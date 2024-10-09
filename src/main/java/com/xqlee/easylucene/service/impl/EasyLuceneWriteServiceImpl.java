@@ -23,6 +23,7 @@ import com.xqlee.easylucene.model.IndexDoc;
 import com.xqlee.easylucene.model.IndexField;
 import com.xqlee.easylucene.service.EasyLuceneWriteService;
 import com.xqlee.easylucene.thread.EasyModelIndexWriteTaskThread;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.Field;
@@ -36,7 +37,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;

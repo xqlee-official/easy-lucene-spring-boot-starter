@@ -110,5 +110,10 @@ String pathname);`
 
 `String keywords = QueryParser.escape(keywords)`
 
+## spring boot 版本对应关系
+- spring boox 2.x.x 使用 com.xqlee.boot:easy-lucene-spring-boot-starter:1.x.x 版本
+- spring boox 3.x.x 使用 com.xqlee.boot:easy-lucene-spring-boot-starter:3.x.x 版本
+
+
 ## LICENSE
 Apache Software License, Version 2.0
