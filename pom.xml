@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.xqlee.boot</groupId>
   <artifactId>easy-lucene-spring-boot-starter</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <name>easy-lucene-spring-boot-starter</name>
   <url>http://github.com/xqlee-official/easy-lucene-spring-boot-starter</url>
   <description>Easy way to use apache lucene.</description>

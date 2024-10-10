@@ -17,6 +17,7 @@
 package com.xqlee.easylucene.autoconfigure;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties({EasyLuceneProperties.class})
 @ComponentScan(basePackages = "com.xqlee.easylucene")
+@Slf4j
 public class EasyLuceneAutoConfiguration {
 
+    public EasyLuceneAutoConfiguration(){
+      log.info("EasyLuceneAutoConfiguration initialized successfully !");
+    }
 }
