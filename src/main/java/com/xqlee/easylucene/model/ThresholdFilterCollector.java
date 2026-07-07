@@ -16,11 +16,13 @@
 
 package com.xqlee.easylucene.model;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.*;
 
 import java.io.IOException;
 
+@Slf4j
 public class ThresholdFilterCollector extends FilterCollector {
 
     private final float threshold;
@@ -53,7 +55,7 @@ public class ThresholdFilterCollector extends FilterCollector {
             public void collect(int doc) throws IOException {
                 // 2. 通过保存的 Scorer 获取当前文档得分
                 float score = scorer.score();
-
+                log.info("score: {} threshold:{} " ,score, threshold);
                 // 只有得分大于等于阈值的文档，才会被真正收集
                 if (score >= threshold) {
                     super.collect(doc);
