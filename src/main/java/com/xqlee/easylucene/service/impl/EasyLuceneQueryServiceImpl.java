@@ -19,16 +19,14 @@ package com.xqlee.easylucene.service.impl;
 import com.xqlee.easylucene.autoconfigure.EasyLuceneProperties;
 import com.xqlee.easylucene.model.SearchField;
 import com.xqlee.easylucene.model.SearchResult;
+import com.xqlee.easylucene.model.ThresholdFilterCollector;
 import com.xqlee.easylucene.service.EasyLuceneQueryService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.search.highlight.*;
@@ -391,6 +389,82 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
     }
 
 
+    @Override
+    public SearchResult query(int currentPage, int pageSize, Query query, List<String> highlightFieldNames, float scoreThreshold, String pathname) {
+        SearchResult result = new SearchResult();
+        result.setCurrentPage(currentPage);
+        result.setPages(pageSize);
+        try {
+            List<Map<String, String>> list = new ArrayList<>();
+            long startTime = System.currentTimeMillis();
+            Directory directory = this.getDirectory(pathname);
+            IndexReader indexReader = this.getReader(directory);
+            IndexSearcher indexSearcher = new IndexSearcher(indexReader);// 查询器
 
+            TopDocs tmp = indexSearcher.search(query, pageSize);
+            int total = 0;
+            if (tmp.totalHits > 0) {
+                // 分页处理
+                ScoreDoc after = getLastScoreDoc(currentPage, pageSize, query, indexSearcher);
 
+                TopScoreDocCollector collector = TopScoreDocCollector.create(pageSize, after);
+                ThresholdFilterCollector thresholdFilterCollector = new ThresholdFilterCollector(collector, scoreThreshold);
+
+                indexSearcher.search(query, thresholdFilterCollector);
+
+                // 查询处理
+                TopDocs topDocs = collector.topDocs();
+
+                // 高亮处理
+                QueryScorer queryScorer = new QueryScorer(query);
+                Fragmenter fragmenter = new SimpleSpanFragmenter(queryScorer);
+                SimpleHTMLFormatter simpleHTMLFormatter = new SimpleHTMLFormatter();
+                Highlighter highlighter = new Highlighter(simpleHTMLFormatter, queryScorer);
+                highlighter.setTextFragmenter(fragmenter);
+
+                Map<String, String> bean;
+                for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                    Document doc = indexSearcher.doc(scoreDoc.doc);
+                    bean = new HashMap<>();
+                    Iterator<IndexableField> iterator = doc.iterator();
+                    while (iterator.hasNext()) {
+                        IndexableField field = iterator.next();
+
+                        // deal highlight
+                        boolean tmpFlag = false;
+                        if (highlightFieldNames!=null){
+                            for (String hField:highlightFieldNames){
+                                if (field.name().equals(hField)) {
+                                    TokenStream tokenStream = analyzer.tokenStream(hField,
+                                            new StringReader(field.stringValue()));
+                                    String highlight = highlighter.getBestFragment(tokenStream, field.stringValue());
+                                    highlight = StringUtils.isEmpty(highlight) ? field.stringValue() : highlight;
+                                    bean.put(field.name(), highlight);
+                                    tmpFlag = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!tmpFlag) {// 非高亮字段,直接赋值
+                            bean.put(field.name(), field.stringValue() == null ? "" : field.stringValue());
+                        }
+                    }
+                    list.add(bean);
+                }
+                total = topDocs.totalHits;
+            }
+
+            result.setRows(list);
+            result.setTotal(total);
+            log.debug("Easy Lucene Index Query Total [{}] Cost Time [{}ms]", total , (System.currentTimeMillis() - startTime));
+            indexReader.close();// 关闭
+            return result;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            result.setRows(new ArrayList<>());
+            result.setTotal(0);
+            return result;
+
+        }
+    }
 }

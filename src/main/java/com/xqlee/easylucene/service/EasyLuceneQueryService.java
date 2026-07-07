@@ -67,4 +67,16 @@ public interface EasyLuceneQueryService {
      */
     SearchResult query(int currentPage, int pageSize, Query query, List<String> highlightFieldNames, String pathname);
 
+    /**
+     * Query 条件查询
+     * @param currentPage 当前页码，默认1，从1开始
+     * @param pageSize 分页大小
+     * @param query 条件 ，（条件值注意 转义字符处理 QueryParser.escape(this.value);）
+     * @param highlightFieldNames 高亮字段
+     * @param scoreThreshold 评分最低阈值
+     * @param pathname 存入时候的路径
+     * @return 查询结果
+     */
+    SearchResult query(int currentPage, int pageSize, Query query, List<String> highlightFieldNames,float scoreThreshold, String pathname);
+
 }
