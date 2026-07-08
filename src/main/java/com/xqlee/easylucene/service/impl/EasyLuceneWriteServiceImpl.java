@@ -18,6 +18,7 @@ package com.xqlee.easylucene.service.impl;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import com.xqlee.easylucene.autoconfigure.AnalyzerProvider;
 import com.xqlee.easylucene.autoconfigure.EasyLuceneProperties;
 import com.xqlee.easylucene.model.IndexDoc;
 import com.xqlee.easylucene.model.IndexField;
@@ -25,7 +26,6 @@ import com.xqlee.easylucene.service.EasyLuceneWriteService;
 import com.xqlee.easylucene.thread.EasyModelIndexWriteTaskThread;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -50,12 +50,12 @@ public class EasyLuceneWriteServiceImpl implements EasyLuceneWriteService {
 
     @Resource
     EasyLuceneProperties easyLuceneProperties;
+    @Resource
+    AnalyzerProvider analyzerProvider;
 
     private IndexWriter getWriter(Directory directory) throws IOException {
-        // 中文分词器
-        SmartChineseAnalyzer analyzer = new SmartChineseAnalyzer();
         // writer配置
-        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzerProvider.getAnalyzer());
         return new IndexWriter(directory, indexWriterConfig);
     }
 
@@ -95,7 +95,7 @@ public class EasyLuceneWriteServiceImpl implements EasyLuceneWriteService {
                 String pathDir = path + File.separator + "tmp" + File.separator + i + File.separator;
                 Directory dir = getDirectory(pathDir);
                 dirs.add(dir);
-                task = new FutureTask<>(new EasyModelIndexWriteTaskThread(subs.get(i), dir));
+                task = new FutureTask<>(new EasyModelIndexWriteTaskThread(subs.get(i), analyzerProvider.getAnalyzer(), dir));
                 pool.execute(task);
                 tasks.add(task);
             }

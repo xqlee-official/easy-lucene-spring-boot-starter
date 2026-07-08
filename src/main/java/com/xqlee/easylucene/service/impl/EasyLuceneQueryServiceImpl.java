@@ -16,6 +16,7 @@
 
 package com.xqlee.easylucene.service.impl;
 
+import com.xqlee.easylucene.autoconfigure.AnalyzerProvider;
 import com.xqlee.easylucene.autoconfigure.EasyLuceneProperties;
 import com.xqlee.easylucene.model.SearchField;
 import com.xqlee.easylucene.model.SearchResult;
@@ -24,7 +25,6 @@ import com.xqlee.easylucene.service.EasyLuceneQueryService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -46,13 +46,14 @@ import java.util.*;
 public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
 
     /** 分词器 **/
-    private SmartChineseAnalyzer analyzer;
+    @Resource
+    AnalyzerProvider analyzerProvider;
 
     @Resource
     EasyLuceneProperties easyLuceneProperties;
 
     public EasyLuceneQueryServiceImpl() {
-        analyzer = new SmartChineseAnalyzer();
+
     }
 
     /**
@@ -65,7 +66,10 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
         String dirPath = easyLuceneProperties.getStore_path() + File.separator + pathname;
         File dir = new File(dirPath);
         if (!dir.exists()) {
-            dir.mkdirs();
+            boolean mkdirs = dir.mkdirs();
+            if (!mkdirs) {
+                log.error("Easy Lucene Create Directory [{}] Failed", dirPath);
+            }
         }
         return FSDirectory.open(Paths.get(dirPath));
     }
@@ -95,7 +99,7 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
             Directory directory = this.getDirectory(pathname);
             IndexReader indexReader = this.getReader(directory);
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);// 查询器
-            QueryParser parser = new QueryParser(searchField.getName(), analyzer);// 查询容器
+            QueryParser parser = new QueryParser(searchField.getName(), analyzerProvider.getAnalyzer());// 查询容器
             Query query = parser.parse(QueryParser.escape(searchField.getValue()));
             // 上次最后一个文档位置
             ScoreDoc after = getLastScoreDoc(currentPage, pageSize, query, indexSearcher);
@@ -111,13 +115,11 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                 Document doc = indexSearcher.doc(scoreDoc.doc);
                 bean = new HashMap<>();
-                Iterator<IndexableField> iterator = doc.iterator();
-                while (iterator.hasNext()) {
-                    IndexableField field = iterator.next();
+                for (IndexableField field : doc) {
                     String fvalue = field.stringValue();
                     // deal highlight
                     if (field.name().equals(searchField.getName()) && searchField.isHighlight()) {
-                        TokenStream tokenStream = analyzer.tokenStream(searchField.getName(), new StringReader(fvalue));
+                        TokenStream tokenStream = analyzerProvider.getAnalyzer().tokenStream(searchField.getName(), new StringReader(fvalue));
                         String highlight = highlighter.getBestFragment(tokenStream, field.stringValue());
                         highlight = highlight == null ? "" : highlight;
                         bean.put(field.name(), highlight);
@@ -167,7 +169,7 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
                     query=new TermQuery(new Term(searchField.getName(),QueryParser.escape(searchField.getValue())));
                 }else{
                     // 解析查询条件进行查询
-                    QueryParser parser = new QueryParser(searchField.getName(), analyzer);
+                    QueryParser parser = new QueryParser(searchField.getName(), analyzerProvider.getAnalyzer());
                     query = parser.parse(QueryParser.escape(searchField.getValue()));
                 }
                 // 1．MUST和MUST：取得连个查询子句的交集。
@@ -202,10 +204,10 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
                         boolean tmpFlag = false;
                         for (SearchField searchField : searchFields) {
                             if (field.name().equals(searchField.getName()) && searchField.isHighlight()) {
-                                TokenStream tokenStream = analyzer.tokenStream(searchField.getName(),
+                                TokenStream tokenStream = analyzerProvider.getAnalyzer().tokenStream(searchField.getName(),
                                         new StringReader(field.stringValue()));
                                 String highlight = highlighter.getBestFragment(tokenStream, field.stringValue());
-                                highlight = StringUtils.isEmpty(highlight) ? field.stringValue() : highlight;
+                                highlight = !StringUtils.hasText(highlight) ? field.stringValue() : highlight;
                                 bean.put(field.name(), highlight);
                                 tmpFlag = true;
                                 break;
@@ -246,7 +248,7 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
 
             BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
             for (SearchField searchField : searchFields) {
-                QueryParser parser = new QueryParser(searchField.getName(), analyzer);// 查询容器
+                QueryParser parser = new QueryParser(searchField.getName(), analyzerProvider.getAnalyzer());// 查询容器
                 Query query = parser.parse(QueryParser.escape(searchField.getValue()));
                 // 1．MUST和MUST：取得连个查询子句的交集。
                 // 2．MUST和MUST_NOT：表示查询结果中不能包含MUST_NOT所对应得查询子句的检索结果。
@@ -275,15 +277,12 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
                 for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                     Document doc = indexSearcher.doc(scoreDoc.doc);
                     bean = new HashMap<>();
-                    Iterator<IndexableField> iterator = doc.iterator();
-                    while (iterator.hasNext()) {
-                        IndexableField field = iterator.next();
-
+                    for (IndexableField field : doc) {
                         // deal highlight
                         boolean tmpFlag = false;
                         for (SearchField searchField : searchFields) {
                             if (field.name().equals(searchField.getName()) && searchField.isHighlight()) {
-                                TokenStream tokenStream = analyzer.tokenStream(searchField.getName(),
+                                TokenStream tokenStream = analyzerProvider.getAnalyzer().tokenStream(searchField.getName(),
                                         new StringReader(field.stringValue()));
                                 String highlight = highlighter.getBestFragment(tokenStream, field.stringValue());
                                 highlight = highlight == null ? "" : highlight;
@@ -358,19 +357,16 @@ public class EasyLuceneQueryServiceImpl implements EasyLuceneQueryService {
                 for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                     Document doc = indexSearcher.doc(scoreDoc.doc);
                     bean = new HashMap<>();
-                    Iterator<IndexableField> iterator = doc.iterator();
-                    while (iterator.hasNext()) {
-                        IndexableField field = iterator.next();
-
+                    for (IndexableField field : doc) {
                         // deal highlight
                         boolean tmpFlag = false;
-                        if (highlightFieldNames!=null){
-                            for (String hField:highlightFieldNames){
+                        if (highlightFieldNames != null) {
+                            for (String hField : highlightFieldNames) {
                                 if (field.name().equals(hField)) {
-                                    TokenStream tokenStream = analyzer.tokenStream(hField,
+                                    TokenStream tokenStream = analyzerProvider.getAnalyzer().tokenStream(hField,
                                             new StringReader(field.stringValue()));
                                     String highlight = highlighter.getBestFragment(tokenStream, field.stringValue());
-                                    highlight = StringUtils.isEmpty(highlight) ? field.stringValue() : highlight;
+                                    highlight = !StringUtils.hasText(highlight) ? field.stringValue() : highlight;
                                     bean.put(field.name(), highlight);
                                     tmpFlag = true;
                                     break;

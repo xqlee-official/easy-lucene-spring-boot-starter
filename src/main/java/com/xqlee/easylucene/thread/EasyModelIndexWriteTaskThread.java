@@ -18,7 +18,7 @@ package com.xqlee.easylucene.thread;
 
 import com.xqlee.easylucene.model.IndexDoc;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -36,16 +36,17 @@ public class EasyModelIndexWriteTaskThread implements Callable<Number> {
     private final List<IndexDoc> documents;
     /** 地址/目录 ***/
     private final Directory directory;
+    private final Analyzer analyzer;
     private int num = 0;
 
-    public EasyModelIndexWriteTaskThread(List<IndexDoc> documents, Directory directory) {
+    public EasyModelIndexWriteTaskThread(List<IndexDoc> documents, Analyzer analyzer,Directory directory) {
         this.documents = documents;
         this.directory = directory;
+        this.analyzer = analyzer;
     }
 
     private IndexWriter getWriter(Directory directory) throws IOException {
         // 中文分词器
-        SmartChineseAnalyzer analyzer = new SmartChineseAnalyzer();
         // writer配置
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
         return new IndexWriter(directory, indexWriterConfig);
@@ -60,8 +61,8 @@ public class EasyModelIndexWriteTaskThread implements Callable<Number> {
             // 转换文档对象
             List<Document> docs = new ArrayList<>();
             Document doc;
-            for (int i = 0; i < documents.size(); i++) {
-                doc = documents.get(i).toDoc();
+            for (IndexDoc document : documents) {
+                doc = document.toDoc();
                 docs.add(doc);
             }
             // 获取写入器

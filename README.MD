@@ -10,7 +10,7 @@ The component library can easily use apache lucene library to quickly realize th
         <dependency>
             <groupId>com.xqlee.boot</groupId>
             <artifactId>easy-lucene-spring-boot-starter</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.4</version>
         </dependency>
 ````
 `The latest version number is recommended`
@@ -23,6 +23,15 @@ spring:
       store_path: your_store_path
       max_threads: 2 # Maximum number of threads for task processing
 ````
+
+#### Custom Analyzer
+
+_3.0.4 added custom Analyzer_
+
+By Default the `SmartChineseAnalyzer` Analyzer is used , Configured in  `com.xqlee.easylucene.autoconfigure.DefaultAnalyzerProvider`. 
+
+You can also customize the Analyzer by extending the `com.xqlee.easylucene.autoconfigure.AnalyzerProvider` class.
+
 
 ### Interface description
 
