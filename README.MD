@@ -32,6 +32,39 @@ By Default the `SmartChineseAnalyzer` Analyzer is used , Configured in  `com.xql
 
 You can also customize the Analyzer by extending the `com.xqlee.easylucene.autoconfigure.AnalyzerProvider` class.
 
+eg:
+````java
+@Configuration
+@Slf4j
+public class LuceneConfig {
+
+
+    @Bean
+    public SmartChineseAnalyzer smartChineseAnalyzer() {
+        log.info("init SmartChineseAnalyzer");
+        CharArraySet stopwords = CharArraySet.EMPTY_SET;
+        try {
+            stopwords = StopWordLoader.loadStopWords("classpath:stopwords.txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new SmartChineseAnalyzer(stopwords);
+    }
+
+    @Bean
+    public AnalyzerProvider analyzerProvide2r(SmartChineseAnalyzer smartChineseAnalyzer) {
+
+        return new AnalyzerProvider(){
+            @Override
+            public Analyzer getAnalyzer() {
+                return smartChineseAnalyzer;
+            }
+        };
+    }
+}
+
+````
+
 
 ### Interface description
 
