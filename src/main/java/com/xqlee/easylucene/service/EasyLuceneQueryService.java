@@ -63,7 +63,7 @@ public interface EasyLuceneQueryService {
      * @param query 条件 ，（条件值注意 转义字符处理 QueryParser.escape(this.value);）
      * @param highlightFieldNames 高亮字段
      * @param pathname 存入时候的路径
-     * @return 查询结果
+     * @return  查询结果
      */
     SearchResult query(int currentPage, int pageSize, Query query, List<String> highlightFieldNames, String pathname);
 

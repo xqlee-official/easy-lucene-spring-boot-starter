@@ -22,13 +22,26 @@ import org.apache.lucene.search.BooleanClause;
 
 import java.util.Objects;
 
+/**
+ * 查询字段
+ */
 @Data
 public class SearchField {
 
+    /**
+     * 默认构造函数
+     */
     public SearchField() {
 
     }
 
+    /**
+     * 构造查询字段
+     *
+     * @param name        字段名称
+     * @param value       字段值
+     * @param isHighlight 是否高亮
+     */
     public SearchField(String name, String value, boolean isHighlight) {
         this.name = name;
         this.value = value;
@@ -57,6 +70,15 @@ public class SearchField {
         this.occur = occur;
 
     }
+
+    /**
+     * 构造基础查询字段
+     * @param name 字段名称
+     * @param value 字段值
+     * @param isHighlight 是否高亮
+     * @param isBaseQuery 是否基础查询
+     * @param occur 多条件查询关联关系
+     */
     public SearchField(String name, String value, boolean isHighlight,boolean isBaseQuery, BooleanClause.Occur occur) {
         this.name = name;
         this.value = value;
@@ -79,12 +101,19 @@ public class SearchField {
      * 是否处理高亮
      ***/
     private boolean isHighlight;
+    /**
+     * 是否是基础查询
+     **/
     private boolean isBaseQuery;
     /**
      * 多条件查询时候
      **/
     private BooleanClause.Occur occur;
 
+    /**
+     * 设置多条件查询关联关系
+     * @param occur 关联关系
+     */
     public void setOccur(BooleanClause.Occur occur) {
         if (occur == null) {
             occur = BooleanClause.Occur.MUST;
@@ -92,6 +121,10 @@ public class SearchField {
         this.occur = occur;
     }
 
+    /**
+     * 获取字段值
+     * @return 字段值
+     */
     public String getValue(){
         if (Objects.nonNull(this.value)){
             return QueryParser.escape(this.value);

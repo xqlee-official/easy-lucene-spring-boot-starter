@@ -18,16 +18,31 @@ package com.xqlee.easylucene.autoconfigure;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * EasyLuceneAutoConfiguration 配置类
+ */
 @Configuration
 @EnableConfigurationProperties({EasyLuceneProperties.class})
 @ComponentScan(basePackages = "com.xqlee.easylucene")
 @Slf4j
 public class EasyLuceneAutoConfiguration {
 
+
+    @Bean
+    @ConditionalOnMissingBean(AnalyzerProvider.class)
+    public AnalyzerProvider defaultAnalyzerProvider(){
+        return new DefaultAnalyzerProvider();
+    }
+
+    /**
+     *  EasyLuceneAutoConfiguration 配置类初始化
+     */
     public EasyLuceneAutoConfiguration(){
       log.info("EasyLuceneAutoConfiguration initialized successfully !");
     }

@@ -19,14 +19,16 @@ package com.xqlee.easylucene.autoconfigure;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 
-@ConditionalOnMissingBean(AnalyzerProvider.class) // 仅当 classpath 下存在 Analyzer 类时才加载此配置
-@Component
+/**
+ * 默认中文分词器提供者
+ */
 @Slf4j
 public class DefaultAnalyzerProvider extends AnalyzerProvider {
 
+    /**
+     * 默认无停止分词的中文分词器提供者
+     */
     public DefaultAnalyzerProvider() {
        log.info("DefaultAnalyzerProvider initialized successfully !");
     }

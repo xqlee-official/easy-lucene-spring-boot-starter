@@ -22,11 +22,20 @@ import org.apache.lucene.search.*;
 
 import java.io.IOException;
 
+/**
+ * 阈值过滤器
+ */
 @Slf4j
 public class ThresholdFilterCollector extends FilterCollector {
 
     private final float threshold;
 
+    /**
+     * 构造函数
+     *
+     * @param in      内部 Collector
+     * @param threshold 阈值
+     */
     public ThresholdFilterCollector(Collector in, float threshold) {
         // 调用父类构造器，将真正的 Collector（如 TopScoreDocCollector）传入
         super(in);

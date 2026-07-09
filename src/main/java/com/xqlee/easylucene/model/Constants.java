@@ -17,6 +17,9 @@
 package com.xqlee.easylucene.model;
 
 
+/**
+ * 索引字段常量
+ */
 public class Constants {
     private Constants(){}
 

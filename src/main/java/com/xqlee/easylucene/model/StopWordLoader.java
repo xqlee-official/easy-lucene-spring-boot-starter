@@ -34,7 +34,9 @@ import java.nio.file.Paths;
  */
 public class StopWordLoader {
 
-    // 私有构造函数，防止外部实例化
+    /**
+     * 私有构造函数，防止实例化
+     */
     private StopWordLoader() {
         throw new UnsupportedOperationException("StopWordLoader Utility class");
     }
@@ -42,6 +44,9 @@ public class StopWordLoader {
     /**
      * 根据路径加载停用词集合
      * @param location 支持 classpath:stopwords.txt 或 file:/opt/app/stopwords.txt
+     *  comment 默认 //
+     * @return CharArraySet
+     * @throws IOException 抛出 IOException
      */
     public static CharArraySet loadStopWords(String location) throws IOException {
         return loadStopWords(location,"//");
@@ -50,6 +55,9 @@ public class StopWordLoader {
     /**
      * 根据路径加载停用词集合
      * @param location 支持 classpath:stopwords.txt 或 file:/opt/app/stopwords.txt
+     * @param comment 停用词文件中的注释行
+     * @return CharArraySet
+     * @throws IOException 抛出 IOException
      */
     public static CharArraySet loadStopWords(String location,String comment) throws IOException {
         InputStream inputStream;

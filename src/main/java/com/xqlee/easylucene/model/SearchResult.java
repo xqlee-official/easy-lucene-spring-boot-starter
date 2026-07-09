@@ -41,6 +41,11 @@ public class SearchResult {
     int pageSize = 10;
     /**
      * 总页数
+     * -- SETTER --
+     *  设置总页数
+     *
+     * @param pages 总页数
+
      */
     int pages;
     /**
@@ -49,7 +54,10 @@ public class SearchResult {
     List<Map<String,String>> rows;
 
 
-
+    /**
+     * 设置总数
+     * @param total 总数
+     */
     public void setTotal(int total){
         this.total = total;
         int pages = 0;
@@ -57,10 +65,6 @@ public class SearchResult {
             pages= total%pageSize == 0 ? total/pageSize:total/pageSize+1;
         }
         setPages(pages);
-    }
-
-    public void setPages(int pages){
-       this.pages = pages;
     }
 
 }
