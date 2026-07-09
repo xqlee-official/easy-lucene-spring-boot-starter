@@ -19,10 +19,10 @@ package com.xqlee.easylucene.autoconfigure;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
-@ConditionalOnClass(AnalyzerProvider.class) // 仅当 classpath 下存在 Analyzer 类时才加载此配置
+@ConditionalOnMissingBean(AnalyzerProvider.class) // 仅当 classpath 下存在 Analyzer 类时才加载此配置
 @Component
 @Slf4j
 public class DefaultAnalyzerProvider extends AnalyzerProvider {
