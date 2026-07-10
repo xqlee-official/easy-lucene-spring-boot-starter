@@ -95,7 +95,7 @@ public class EasyLuceneWriteServiceImpl implements EasyLuceneWriteService {
                 String pathDir = path + File.separator + "tmp" + File.separator + i + File.separator;
                 Directory dir = getDirectory(pathDir);
                 dirs.add(dir);
-                task = new FutureTask<>(new EasyModelIndexWriteTaskThread(subs.get(i), analyzerProvider.getAnalyzer(), dir));
+                task = new FutureTask<>(new EasyModelIndexWriteTaskThread(subs.get(i), analyzerProvider.getAnalyzer(),easyLuceneProperties.getRam_buffer_size(), dir));
                 pool.execute(task);
                 tasks.add(task);
             }

@@ -40,4 +40,10 @@ public class EasyLuceneProperties {
      * 数量因根据cpu数量、硬盘io性能自行调整
      */
     int max_threads = 2;
+
+    /**
+     * 批量写入缓冲区大小，默认32MB
+     * 批量写入建议 32MB 起步
+     */
+    int ram_buffer_size = 16;
 }
