@@ -16,6 +16,7 @@
 
 package com.xqlee.easylucene.model;
 
+import lombok.Getter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -39,6 +40,7 @@ public class IndexDoc {
         }
     }
 
+    @Getter
     private final List<IndexField> fields = new ArrayList<>();
 
     public Document toDoc() {

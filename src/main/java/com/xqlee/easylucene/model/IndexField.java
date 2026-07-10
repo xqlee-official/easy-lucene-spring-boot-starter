@@ -18,6 +18,7 @@ package com.xqlee.easylucene.model;
 
 
 import lombok.Data;
+import org.apache.lucene.analysis.Analyzer;
 
 @Data
 public class IndexField {
@@ -40,6 +41,8 @@ public class IndexField {
     private String value;
     /** 是否保存 **/
     private boolean store;
+    /** 分词器 (字段使用独立分词器，优先级高于默认，可选配置) **/
+    private Analyzer analyzer;
     /** 是否分词 **/
     private boolean analysis;
 }

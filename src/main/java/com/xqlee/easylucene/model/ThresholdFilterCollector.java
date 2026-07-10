@@ -64,7 +64,7 @@ public class ThresholdFilterCollector extends FilterCollector {
             public void collect(int doc) throws IOException {
                 // 2. 通过保存的 Scorer 获取当前文档得分
                 float score = scorer.score();
-                log.info("score: {} threshold:{} " ,score, threshold);
+                log.debug("score: {} threshold:{} " ,score, threshold);
                 // 只有得分大于等于阈值的文档，才会被真正收集
                 if (score >= threshold) {
                     super.collect(doc);

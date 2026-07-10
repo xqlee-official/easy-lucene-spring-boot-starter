@@ -17,16 +17,18 @@
 package com.xqlee.easylucene.thread;
 
 import com.xqlee.easylucene.model.IndexDoc;
+import com.xqlee.easylucene.model.IndexField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 @Slf4j
@@ -45,41 +47,35 @@ public class EasyModelIndexWriteTaskThread implements Callable<Number> {
         this.analyzer = analyzer;
     }
 
-    private IndexWriter getWriter(Directory directory) throws IOException {
-        // 中文分词器
-        // writer配置
-        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
-        return new IndexWriter(directory, indexWriterConfig);
-    }
-
-    public void doTask() throws IOException {
-        // 获取写入器
-        IndexWriter indexWriter = null;
+    public void doTask(){
         try {
             // 线程启用时间标记
             long startTime = System.currentTimeMillis();
-            // 转换文档对象
-            List<Document> docs = new ArrayList<>();
             Document doc;
             for (IndexDoc document : documents) {
                 doc = document.toDoc();
-                docs.add(doc);
-            }
-            // 获取写入器
-            indexWriter = getWriter(directory);
-            indexWriter.addDocuments(docs);
-            num = indexWriter.numDocs();
-            indexWriter.close();
+                List<IndexField> list = document.getFields().stream().filter(IndexField::isAnalysis).filter(e -> Objects.nonNull(e.getAnalyzer())).toList();
+                if (!list.isEmpty()){
+                    Map<String,Analyzer> map = list.stream().collect(java.util.stream.Collectors.toMap(IndexField::getName, IndexField::getAnalyzer));
+                    Analyzer perFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(analyzer,map);
+                    IndexWriterConfig indexWriterConfig = new IndexWriterConfig(perFieldAnalyzerWrapper);
+                    try (IndexWriter writer = new IndexWriter(directory, indexWriterConfig)){
+                        writer.addDocument(doc);
+                        this.num++;
+                    }
+                }else{
+                    IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
+                    try (IndexWriter writer = new IndexWriter(directory, indexWriterConfig)){
+                        writer.addDocument(doc);
+                        this.num++;
+                    }
+                }
 
-            log.info("Easy Lucene Total Document[{}] Cost Time[{}] Thread Name [{}]",docs.size(),
+            } // end for
+            log.info("Easy Lucene Total Document[{}] Cost Time[{}] Thread Name [{}]",documents.size(),
                     (System.currentTimeMillis() - startTime),Thread.currentThread().getName());
-            this.num = docs.size();
-        } catch (Exception e) {
+        }catch (Exception e) {
             log.error(e.getMessage(), e);
-        } finally {
-            if(indexWriter!=null){
-                indexWriter.close();
-            }
         }
     }
 
